@@ -52,6 +52,11 @@ Including jQuery (https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.
 Compile the code with the following command. 
     
     coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee
+    
+# FAQ
+* I am seeing the error "Cannot find module 'coffee-script'"
+  
+  Please export the NODE_PATH variable.  export NODE_PATH=$NODE_PATH:<path>/homebrew/lib/node_modules/
 
 
 
