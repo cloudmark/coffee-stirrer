@@ -34,6 +34,7 @@ Including jQuery from the libs Folder to a file acoffee.coffee and output the co
     )) 
   
 Compile the code with the following command. 
+    
     coffee coffeescript-stirrer.coffee -c -I ../libs --output ./output afile.coffee
     
 
@@ -49,6 +50,7 @@ Including jQuery (https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.
     ))
 
 Compile the code with the following command. 
+    
     coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee
 
 
