@@ -27,34 +27,33 @@ Local Example
 Including jQuery from the libs Folder to a file acoffee.coffee and output the compiled class in ./output.  
 
 acoffee.coffee
---------------
-<code>
-#=include <jquery-1.7.2.min.js>
+  <code>  
+  #=include <jquery-1.7.2.min.js>
+  
+  $(document).ready(( ->
+    console.log "Hello World"
+  )) 
+  </code>
 
-$(document).ready(( ->
-  console.log "Hello World"
-))
-</code>
 
-
-<code>coffee coffeescript-stirrer.coffee -c -I ../libs --output ./output afile.coffee</code>
+  <code>coffee coffeescript-stirrer.coffee -c -I ../libs --output ./output afile.coffee</code>
 
 Remote Example 
 =============
 Including jQuery (https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js) to a file acoffee.coffee and output the compiled class in ./output.  
 
 acoffee.coffee
---------------
-<code>
-#=include <https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js>
 
-$(document).ready(( ->
-  console.log "Hello World"
-))
-</code>
+  <code>
+  #=include <https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js>
+
+  $(document).ready(( ->
+    console.log "Hello World"
+  ))
+  </code>
 
 
-<code>coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee</code>
+  <code>coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee</code>
 
 
 
