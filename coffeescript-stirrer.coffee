@@ -29,10 +29,12 @@ downloadFile = (file, callback) ->
     callback(null))
   )
 
+  file = ''
   # If an error occurs we return a null.
   request = remote.request('GET', siteUrl.pathname ,{'host': siteUrl.hostname });
   request.on('response',
     ((response) ->
+
       if (response.statusCode + 0) == 200
         process.stdout.write("\t Downloading File: [ #{siteUrl.pathname} ] ")
         response.on('data', ((chunk) ->
@@ -61,7 +63,7 @@ findIncludes = (file, contents, _resolved) ->
   dependencies = []
   while (result = INCLUDE_REGEX.exec(contents)) != null
     depending_file = result[1]
-    console.log("File: [#{file}] requires <-- [#{depending_file}]")
+    # console.log("File: [#{file}] requires <-- [#{depending_file}]")
     if JS_FILE.test(depending_file) then ftype = "js"
     if COFFEE_FILE.test(depending_file) then ftype = "coffee"
     remote=HTTP.test(depending_file)
@@ -125,6 +127,7 @@ resolveDependencies = (dependencies, includeDirectories, callback, results) ->
       found = false
       for directory in includeDirectories
         for file in fs.readdirSync(directory)
+          # TODO: Make Unique FileName *--- Directory
           if path.basename(file) == dependency.file
             dependency.data = fs.readFileSync(directory + file)
             addDependencyAndContinue(dependency)
@@ -154,10 +157,27 @@ removeDirectives = (file) ->
 getFilename = (file, ext) ->
   return path.basename(file, ext)
 
+recursiveIncludes = (includeDirectories) ->
+  results = includeDirectories
+  for directory in includeDirectories
+      unless directory[directory.length-1] == ('/')
+        directory += '/'
+      files = fs.readdirSync(directory)
+      # Check which of them are directories.
+      for file in files
+        stat = fs.lstatSync(directory + file)
+        if stat .isDirectory()
+          localResult = recursiveIncludes([directory + file])
+          for local in localResult
+            unless local[local.length-1] == ('/')
+              local += '/'
+            results.push(local)
+  results
+
 processcommand = (sourceFiles, includeDirectories, outputDir, compile, watch, _dependencies) ->
   compilation+=1
-  console.log("Compilation Epoch: #{compilation}")
-  console.log("----------------------------------------------------")
+  #console.log("Compilation Epoch: #{compilation}")
+  #console.log("----------------------------------------------------")
 
   for file in sourceFiles
     contents = fs.readFileSync(file)
@@ -171,16 +191,16 @@ processcommand = (sourceFiles, includeDirectories, outputDir, compile, watch, _d
       js_file = outputDir + filename + ".js"
 
       # Create the contents of the file.
-      console.log("Preparing Temporal File #{output_file}. #{dependencies.length} Dependencies Found.  ")
+      # console.log("Preparing Temporal File #{output_file}. #{dependencies.length} Dependencies Found.  ")
 
       buffer = "`// Preprocessed using Coffee-Stirrer v1.0 `\n\n"
       for dependency in dependencies
-        console.log("\tInjecting #{dependency.file} [#{dependency.ftype}]")
+        # console.log("\tInjecting #{dependency.file} [#{dependency.ftype}]")
         # Determine whether the javascript file or a coffee script file.
         if dependency.ftype == "js"
           buffer += "`"  + dependency.data + "`\n\n"
         else
-          buffer += dependency.data
+          buffer += dependency.data + "\n\n"
 
       buffer += contents
       buffer = removeDirectives(buffer)
@@ -188,7 +208,11 @@ processcommand = (sourceFiles, includeDirectories, outputDir, compile, watch, _d
 
       js_buffer = ""
       try
-        console.log("Compiling Temporal File #{output_file} --> #{js_file}. ")
+        dependencyString = ""
+        for dependency in dependencies
+          dependencyString += dependency.file + " "
+
+        console.log("coffee-stirrer: compiling File #{file} -> #{js_file}. [#{dependencyString}] [#{compilation}]")
 
         nodes = coffee.nodes(coffee.tokens(buffer));
         js_buffer = nodes.compile()
@@ -197,19 +221,17 @@ processcommand = (sourceFiles, includeDirectories, outputDir, compile, watch, _d
         showError(err)
 
       # Remove the temporary file
-      #fs.unlinkSync(output_file)
+      fs.unlinkSync(output_file)
 
     resolveDependencies(dependencies,includeDirectories, ((solvedDependencies, error) ->
-      # Update our dependency information.
-      dependencies = solvedDependencies
-      console.log ""
-      console.log("#{dependencies.length} Dependencies for File #{file} resolved. ")
-      console.log ""
+      #console.log ""
+      #console.log("#{solvedDependencies.length} Dependencies for File #{file} resolved. ")
+      #console.log ""
       if watch
         fs.watchFile(file, { persistent: true, interval: 1}, ((curr, prev) ->
           if curr.mtime.toString() != prev.mtime.toString()
             # Compile the file.
-            processcommand([file], includeDirectories, outputDir, true, false, dependencies)
+            processcommand([file], includeDirectories, outputDir, true, false, solvedDependencies)
         ))
 
       if compile and !error
@@ -238,7 +260,7 @@ while readingFlags and i < args.length
     dir = args[i++]
     unless dir[dir.length-1] == ('/')
       dir += '/'
-    console.log("Added Directory [#{dir}] to search path.  ");
+    # console.log("Added Directory [#{dir}] to search path.  [RECURSIVE] ");
     includeDirectories.push(dir)
 
   else if args[i] == '-c' or args[i] == '--compile'
@@ -257,17 +279,17 @@ while readingFlags and i < args.length
   else
     readingFlags = false
 
-console.log("""
-====================================================
-COFFEE STIRRER Version 1.0
-====================================================
-Options:
-----------------------------------------------------
-  Compilation Flag: [#{compile}]"
-  Watch Flag:  [#{watch}]"
-  Output Directory: [#{outputDir}]"
+#console.log("""
+#====================================================
+#COFFEE STIRRER Version 1.0
+#====================================================
+#Options:
+#----------------------------------------------------
+#  Compilation Flag: [#{compile}]"
+#  Watch Flag:  [#{watch}]"
+#  Output Directory: [#{outputDir}]"
+#""");
 
-""");
 while i < args.length
   sourceFiles.push(args[i++])
 
@@ -275,5 +297,7 @@ unless sourceFiles.length > 0
   console.log('Please supply at least 1 source files to run.  ')
   process.exit(1)
 
-# Process the commands.
+# Recursively include every directory. Still quite raw.
+includeDirectories = recursiveIncludes(includeDirectories)
+# Process the command thus merging and downloading the file.
 processcommand(sourceFiles, includeDirectories, outputDir, compile, watch)
