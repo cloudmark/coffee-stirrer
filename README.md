@@ -3,9 +3,7 @@
 Coffee Stirrer is a coffee script pre processor that allows the user to use <code>#=include <file> </code> in their scripts.  
 The file can be a local file present in a folder or a remote file.  
 
-Both Javascript and Coffeescript files are allowed for inclusion. 
-
-This project was inspired by https://github.com/fairfieldt/coffeescript-concat and awesome script that allows concatenation of coffee script files.   
+Both CSS, Javascript and Coffeescript files are allowed for inclusion. 
 
 
 # Usage
@@ -52,6 +50,19 @@ Including jQuery (https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.
 Compile the code with the following command. 
     
     coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee
+    
+    
+Including JQuery UI CSS (https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css) to a file acoffee.coffee and output the compiled class in ./output.  
+Note that CSS can only be remote.  
+
+### acoffee.coffee
+
+    #= include <https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css>
+    
+    $(document).ready(( ->
+        console.log "Hello World"
+    ))
+
     
 # FAQ
 * I am seeing the error "Cannot find module 'coffee-script'"
