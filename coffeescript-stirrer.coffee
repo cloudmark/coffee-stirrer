@@ -13,7 +13,7 @@ INCLUDE_REGEX = /#=\s*include\s+<([^>\r\n]*)>/g
 HTTP = /^http/
 COFFEE_FILE = /\.coffee$/
 JS_FILE = /\.js$/
-
+CSS_FILE = /\.css$/
 
 showError = (message) ->
   console.error "\t----------------------------------------------------------------------"
@@ -66,6 +66,7 @@ findIncludes = (file, contents, _resolved) ->
     # console.log("File: [#{file}] requires <-- [#{depending_file}]")
     if JS_FILE.test(depending_file) then ftype = "js"
     if COFFEE_FILE.test(depending_file) then ftype = "coffee"
+    if CSS_FILE.test(depending_file) then ftype = "css"
     remote=HTTP.test(depending_file)
     record = {
       file: depending_file
@@ -113,26 +114,33 @@ resolveDependencies = (dependencies, includeDirectories, callback, results) ->
         console.log("\t Dependency #{dependency.file} has already been downloaded.  Retrieved from cache.  ")
         addDependencyAndContinue(dependency)
       else
-        downloadFile(dependency.file, ( (data)->
-          # We have retrieved the file.
-          if data?
-            # Add this to the dependency list.
-            dependency.data = data
-            addDependencyAndContinue(dependency)
-          else
-            showError "\tDependency: #{dependency.file} could not be retrieved.  [REMOTE]"
-            callback(results, true)
-        ))
+        if dependency.ftype == "css"
+          dependency.data= dependency.file
+          addDependencyAndContinue(dependency)
+        else
+          downloadFile(dependency.file, ( (data)->
+            # We have retrieved the file.
+            if data?
+              # Add this to the dependency list.
+              dependency.data = data
+              addDependencyAndContinue(dependency)
+            else
+              showError "\tDependency: #{dependency.file} could not be retrieved.  [REMOTE]"
+              callback(results, true)
+          ))
     else
-      found = false
-      for directory in includeDirectories
-        for file in fs.readdirSync(directory)
-          # TODO: Make Unique FileName *--- Directory
-          if path.basename(file) == dependency.file
-            dependency.data = fs.readFileSync(directory + file)
-            addDependencyAndContinue(dependency)
-            found = true
-            break
+      if dependency.ftype == "css"
+        throw "CSS Include cannot be a local include.  "
+      else
+        found = false
+        for directory in includeDirectories
+          for file in fs.readdirSync(directory)
+            # TODO: Make Unique FileName *--- Directory
+            if path.basename(file) == dependency.file
+              dependency.data = fs.readFileSync(directory + file)
+              addDependencyAndContinue(dependency)
+              found = true
+              break
 
       unless found
         showError "\tERROR: Dependency: #{dependency.file} could not be retrieved.  [LOCAL]"
@@ -199,8 +207,16 @@ processcommand = (sourceFiles, includeDirectories, outputDir, compile, watch, _d
         # Determine whether the javascript file or a coffee script file.
         if dependency.ftype == "js"
           buffer += "`"  + dependency.data + "`\n\n"
-        else
+        else if dependency.ftype == "coffee"
           buffer += dependency.data + "\n\n"
+        else
+          dependency.data = (dependency.data + '').replace(/(\r\n|\n|\r)/gm,"; ")
+          # Some sites try to use iframes.  So we need to inject the style on all the iframes
+          # Inject to the CSS>
+          buffer += "linkElem = document.createElement('link');\n\n"
+          buffer += "linkElem.href = \"#{dependency.data}\";\n\n"
+          buffer += "linkElem.rel= \"stylesheet\";\n\n"
+          buffer += "document.getElementsByTagName('head')[0].appendChild(linkElem)\n\n"
 
       buffer += contents
       buffer = removeDirectives(buffer)
