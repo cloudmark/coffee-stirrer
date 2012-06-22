@@ -52,8 +52,7 @@ Compile the code with the following command.
     coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee
     
     
-Including JQuery UI CSS (https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css) to a file acoffee.coffee and output the compiled class in ./output.  
-Note that CSS can only be remote.  
+Including JQuery UI CSS (https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css) to a file acoffee.coffee and output the compiled class in ./output. Note that CSS can only be remote.  
 
 ### acoffee.coffee
 
