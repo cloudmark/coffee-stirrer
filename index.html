@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Coffee-Stirrer by cloudmark</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Coffee-Stirrer</h1>
+        <p>Inclusion of CSS, JS, and Coffeescript using a CoffeeScript Pre-Processor</p>
+
+        <p class="view"><a href="https://github.com/cloudmark/coffee-stirrer">View the Project on GitHub <small>cloudmark/coffee-stirrer</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/cloudmark/coffee-stirrer/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/cloudmark/coffee-stirrer/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/cloudmark/coffee-stirrer">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Coffee Stirrer</h1>
+
+<p>Coffee Stirrer is a coffee script pre processor that allows the user to use <code>#=include </code> in their scripts.<br>
+The file can be a local file present in a folder or a remote file.  </p>
+
+<p>Both CSS, Javascript and Coffeescript files are allowed for inclusion. </p>
+
+<h1>Usage</h1>
+
+<p>Coffee-Stirrer supports compilation and watching over files.  </p>
+
+<p>To compile a coffee script file (e.g. afile.coffee) to a folder (e.g. output) and include a libraries directory (e.g. ./libs) use</p>
+
+<pre><code>coffee coffeescript-stirrer.coffee -c -I ../libs --output ./output afile.coffee
+</code></pre>
+
+<p>To watch  a coffee script file (e.g. afile.coffee) to a folder (e.g. output) and include a libraries directory (e.g. ./libs) use</p>
+
+<pre><code>coffee coffeescript-stirrer.coffee -w -c -I ../libs --output ./output afile.coffee
+</code></pre>
+
+<h1>Example</h1>
+
+<h2>Local</h2>
+
+<p>Including jQuery from the libs Folder to a file acoffee.coffee and output the compiled class in ./output.  </p>
+
+<h3>acoffee.coffee</h3>
+
+<pre><code>#=include &lt;jquery-1.7.2.min.js&gt;
+
+$(document).ready(( -&gt;
+    console.log "Hello World"
+)) 
+</code></pre>
+
+<p>Compile the code with the following command. </p>
+
+<pre><code>coffee coffeescript-stirrer.coffee -c -I ../libs --output ./output afile.coffee
+</code></pre>
+
+<h2>Remote</h2>
+
+<p>Including jQuery (<a href="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js</a>) to a file acoffee.coffee and output the compiled class in ./output.  </p>
+
+<h3>acoffee.coffee</h3>
+
+<pre><code>#=include &lt;https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js&gt;
+
+$(document).ready(( -&gt;
+    console.log "Hello World"
+))
+</code></pre>
+
+<p>Compile the code with the following command. </p>
+
+<pre><code>coffee coffeescript-stirrer.coffee -c --output ./output afile.coffee
+</code></pre>
+
+<p>Including JQuery UI CSS (<a href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css">https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css</a>) to a file acoffee.coffee and output the compiled class in ./output. Note that CSS can only be remote.  </p>
+
+<h3>acoffee.coffee</h3>
+
+<pre><code>#= include &lt;https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery.ui.all.css&gt;
+
+$(document).ready(( -&gt;
+    console.log "Hello World"
+))
+</code></pre>
+
+<h1>FAQ</h1>
+
+<ul>
+<li>
+<p>I am seeing the error "Cannot find module 'coffee-script'"</p>
+
+<p>Please export the NODE_PATH variable.  export NODE_PATH=$NODE_PATH:/homebrew/lib/node_modules/</p>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/cloudmark">cloudmark</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-32781094-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
